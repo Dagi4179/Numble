@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#080b14" />
+  <meta name="description" content="NUMBLE — The daily 4-digit number puzzle. New puzzle every day at midnight UTC." />
+  <title>NUMBLE — Daily Number Puzzle</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23080b14'/><text y='24' x='4' font-size='22' font-family='monospace' font-weight='bold' fill='%236366f1'>N</text></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="default" data-difficulty="normal">
+
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <div class="page-wrapper">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════ -->
+    <header class="site-header">
+      <div class="header-inner">
+
+        <div class="header-brand">
+          <div class="brand-logo" aria-hidden="true">
+            <span class="logo-bracket">[</span>
+            <span class="logo-n">N</span>
+            <span class="logo-bracket">]</span>
+          </div>
+          <div class="brand-text">
+            <h1 class="game-title">NUMBLE</h1>
+            <p class="game-tagline">Daily Number Puzzle</p>
+          </div>
+        </div>
+
+        <div class="header-meta">
+          <div class="puzzle-badge">
+            <span class="puzzle-badge-label">PUZZLE</span>
+            <span class="puzzle-badge-num" id="puzzleNum">#001</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Mute toggle -->
+          <button class="icon-btn" id="muteBtn" title="Toggle sound" aria-label="Toggle sound" aria-pressed="false">
+            <svg class="icon-sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <svg class="icon-sound-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          </button>
+          <!-- Theme -->
+          <button class="icon-btn" id="themeBtn" title="Change theme" aria-label="Change theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+          <!-- Calendar -->
+          <button class="icon-btn" id="calendarBtn" title="History" aria-label="View history">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+          <!-- Achievements -->
+          <button class="icon-btn" id="achievementsBtn" title="Achievements" aria-label="View achievements">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </button>
+          <!-- Stats -->
+          <button class="icon-btn" id="statsBtn" title="Statistics" aria-label="View statistics">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </button>
+          <!-- Info -->
+          <button class="icon-btn" id="infoBtn" title="How to play" aria-label="How to play">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+        </div>
+
+      </div>
+      <div class="header-progress">
+        <div class="header-progress-fill" id="progressFill"></div>
+      </div>
+    </header>
+
+    <!-- ══ MAIN ══════════════════════════════════════════════════ -->
+    <main class="game-main">
+
+      <!-- Top info strip -->
+      <div class="date-strip" id="dateStrip">
+        <span class="date-strip-icon">📅</span>
+        <span id="dateDisplay">—</span>
+        <span class="date-strip-sep">·</span>
+        <span class="difficulty-pill" id="difficultyPill">NORMAL</span>
+        <span class="date-strip-sep">·</span>
+        <span id="attemptsLeft">8 attempts remaining</span>
+      </div>
+
+      <!-- Hint bar (shown when hints are available) -->
+      <div class="hint-bar" id="hintBar">
+        <span class="hint-bar-label">HINTS</span>
+        <div class="hint-btns">
+          <button class="hint-btn" id="hint1Btn" aria-label="Hint 1: Odd or Even">
+            <span class="hint-btn-icon">🔢</span>
+            <span>Odd / Even</span>
+          </button>
+          <button class="hint-btn" id="hint2Btn" aria-label="Hint 2: Digit Sum">
+            <span class="hint-btn-icon">➕</span>
+            <span>Digit Sum</span>
+          </button>
+        </div>
+        <span class="hint-used-label" id="hintUsedLabel">2 remaining</span>
+      </div>
+
+      <!-- Board -->
+      <div class="board-container">
+        <div class="board-wrapper" id="board" role="grid" aria-label="Guess grid"></div>
+      </div>
+
+      <!-- Keyboard -->
+      <div class="keyboard-section">
+        <div class="keyboard" id="keyboard" role="group" aria-label="Number input keyboard">
+          <div class="keyboard-row">
+            <button class="key" data-key="7" aria-label="7">7</button>
+            <button class="key" data-key="8" aria-label="8">8</button>
+            <button class="key" data-key="9" aria-label="9">9</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key" data-key="4" aria-label="4">4</button>
+            <button class="key" data-key="5" aria-label="5">5</button>
+            <button class="key" data-key="6" aria-label="6">6</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key" data-key="1" aria-label="1">1</button>
+            <button class="key" data-key="2" aria-label="2">2</button>
+            <button class="key" data-key="3" aria-label="3">3</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key key-wide key-delete" data-key="Backspace" aria-label="Delete">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                <line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/>
+              </svg>
+            </button>
+            <button class="key" data-key="0" aria-label="0">0</button>
+            <button class="key key-wide key-enter" data-key="Enter" aria-label="Submit guess">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Confetti -->
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <!-- ══════════════════════════════════════════════════════════
+       GAME OVER MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="gameOverModal" role="dialog" aria-modal="true" aria-labelledby="goStatus">
+    <div class="modal modal-gameover">
+      <div class="modal-orb" id="goOrb" aria-hidden="true"></div>
+      <div class="modal-body">
+
+        <div class="go-status-wrap">
+          <div class="go-emoji" id="goEmoji">🎯</div>
+          <h2 class="go-status" id="goStatus">Solved!</h2>
+          <p class="go-sub" id="goSub">—</p>
+        </div>
+
+        <div class="answer-reveal" id="answerReveal" aria-label="The answer">
+          <span class="answer-label">THE NUMBER WAS</span>
+          <div class="answer-digits" id="answerDigits"></div>
+        </div>
+
+        <div class="distribution" id="distributionWrap">
+          <div class="distribution-title">GUESS DISTRIBUTION</div>
+          <div class="dist-bars" id="distBars"></div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-item"><div class="stat-val" id="statPlayed">0</div><div class="stat-lbl">Played</div></div>
+          <div class="stat-item"><div class="stat-val" id="statWinPct">0%</div><div class="stat-lbl">Win Rate</div></div>
+          <div class="stat-item"><div class="stat-val" id="statStreak">0</div><div class="stat-lbl">Streak</div></div>
+          <div class="stat-item"><div class="stat-val" id="statBest">0</div><div class="stat-lbl">Best</div></div>
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <div class="countdown-wrap">
+          <div class="countdown-label">NEXT PUZZLE IN</div>
+          <div class="countdown-clock">
+            <div class="clock-unit"><span class="clock-num" id="cdH">00</span><span class="clock-lbl">HRS</span></div>
+            <div class="clock-colon">:</div>
+            <div class="clock-unit"><span class="clock-num" id="cdM">00</span><span class="clock-lbl">MIN</span></div>
+            <div class="clock-colon">:</div>
+            <div class="clock-unit"><span class="clock-num" id="cdS">00</span><span class="clock-lbl">SEC</span></div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-share" id="shareBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share Result
+          </button>
+          <button class="btn-practice" id="practiceBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play Practice Mode
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       PRACTICE MODE MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="practiceModal" role="dialog" aria-modal="true" aria-labelledby="practiceTitle">
+    <div class="modal modal-practice">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="practiceTitle">Practice Mode</h2>
+        <button class="modal-close" id="closePracticeBtn" aria-label="Close practice">✕</button>
+      </div>
+      <div class="practice-board-wrap">
+        <div class="practice-info-strip">
+          <span id="practiceStatus">Guess the 4-digit number</span>
+          <span class="practice-count-label">Round <span id="practiceRound">1</span></span>
+        </div>
+        <div class="board-wrapper practice-board" id="practiceBoard" role="grid"></div>
+        <div class="keyboard keyboard-practice" id="practiceKeyboard" role="group">
+          <div class="keyboard-row">
+            <button class="key" data-pkey="7">7</button>
+            <button class="key" data-pkey="8">8</button>
+            <button class="key" data-pkey="9">9</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key" data-pkey="4">4</button>
+            <button class="key" data-pkey="5">5</button>
+            <button class="key" data-pkey="6">6</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key" data-pkey="1">1</button>
+            <button class="key" data-pkey="2">2</button>
+            <button class="key" data-pkey="3">3</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key key-wide key-delete" data-pkey="Backspace">⌫</button>
+            <button class="key" data-pkey="0">0</button>
+            <button class="key key-wide key-enter" data-pkey="Enter">↵</button>
+          </div>
+        </div>
+        <div class="practice-result" id="practiceResult" style="display:none">
+          <div class="practice-result-text" id="practiceResultText"></div>
+          <button class="btn-next-round" id="nextRoundBtn">Next Round →</button>
+        </div>
+        <div class="practice-stats-mini">
+          <span>Wins: <strong id="pWins">0</strong></span>
+          <span>Played: <strong id="pPlayed">0</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       STATS MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="modal modal-stats">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="statsTitle">Statistics</h2>
+        <button class="modal-close" id="closeStatsBtn" aria-label="Close statistics">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-row">
+          <div class="stat-item"><div class="stat-val" id="st2Played">0</div><div class="stat-lbl">Played</div></div>
+          <div class="stat-item"><div class="stat-val" id="st2WinPct">0%</div><div class="stat-lbl">Win Rate</div></div>
+          <div class="stat-item"><div class="stat-val" id="st2Streak">0</div><div class="stat-lbl">Streak</div></div>
+          <div class="stat-item"><div class="stat-val" id="st2Best">0</div><div class="stat-lbl">Best</div></div>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="distribution-title">GUESS DISTRIBUTION</div>
+        <div class="dist-bars" id="distBars2"></div>
+        <div class="modal-divider"></div>
+        <!-- Difficulty selector -->
+        <div class="section-label">DIFFICULTY</div>
+        <div class="difficulty-options">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn" data-diff="normal">Normal</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+          <button class="diff-btn" data-diff="nightmare">Nightmare</button>
+        </div>
+        <div class="diff-desc" id="diffDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ACHIEVEMENTS MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="achievementsModal" role="dialog" aria-modal="true" aria-labelledby="achievementsTitle">
+    <div class="modal modal-achievements">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="achievementsTitle">Achievements</h2>
+        <button class="modal-close" id="closeAchievementsBtn" aria-label="Close achievements">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="achievements-grid" id="achievementsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CALENDAR / HISTORY MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="calendarModal" role="dialog" aria-modal="true" aria-labelledby="calendarTitle">
+    <div class="modal modal-calendar">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="calendarTitle">History</h2>
+        <button class="modal-close" id="closeCalendarBtn" aria-label="Close history">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="calendar-nav">
+          <button class="cal-nav-btn" id="calPrevBtn">‹</button>
+          <span class="cal-month-label" id="calMonthLabel">—</span>
+          <button class="cal-nav-btn" id="calNextBtn">›</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="calendar-legend">
+          <span class="cal-leg-item"><span class="cal-dot won"></span>Won</span>
+          <span class="cal-leg-item"><span class="cal-dot lost"></span>Lost</span>
+          <span class="cal-leg-item"><span class="cal-dot unplayed"></span>Not played</span>
+          <span class="cal-leg-item"><span class="cal-dot future"></span>Future</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       THEME MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="themeModal" role="dialog" aria-modal="true" aria-labelledby="themeTitle">
+    <div class="modal modal-theme">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="themeTitle">Themes</h2>
+        <button class="modal-close" id="closeThemeBtn" aria-label="Close themes">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="theme-grid">
+          <button class="theme-card" data-theme="default">
+            <div class="theme-preview theme-preview-default"></div>
+            <span>Default</span>
+          </button>
+          <button class="theme-card" data-theme="neon">
+            <div class="theme-preview theme-preview-neon"></div>
+            <span>Neon</span>
+          </button>
+          <button class="theme-card" data-theme="cyberpunk">
+            <div class="theme-preview theme-preview-cyberpunk"></div>
+            <span>Cyberpunk</span>
+          </button>
+          <button class="theme-card" data-theme="matrix">
+            <div class="theme-preview theme-preview-matrix"></div>
+            <span>Matrix</span>
+          </button>
+          <button class="theme-card" data-theme="retro">
+            <div class="theme-preview theme-preview-retro"></div>
+            <span>Retro</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       INFO / HOW TO PLAY MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="modal modal-info">
+      <div class="modal-header-bar">
+        <h2 class="modal-title" id="infoTitle">How to Play</h2>
+        <button class="modal-close" id="closeInfoBtn" aria-label="Close instructions">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="info-intro">
+          Guess the secret <strong>4-digit number</strong> (all digits unique) in <strong>8 tries</strong>.
+          A new puzzle drops every day at <strong>00:00 UTC</strong>.
+        </div>
+
+        <ul class="rules-list">
+          <li>
+            <span class="rule-icon-wrap" style="background:rgba(99,102,241,0.15);color:#818cf8">🌍</span>
+            <div><strong>Same number worldwide</strong> — everyone solves the same puzzle each day.</div>
+          </li>
+          <li>
+            <span class="rule-icon-wrap" style="background:rgba(74,222,128,0.12);color:#4ade80">🔢</span>
+            <div><strong>All digits are unique</strong> — no repeated digits in the answer ever.</div>
+          </li>
+          <li>
+            <span class="rule-icon-wrap" style="background:rgba(251,191,36,0.12);color:#fbbf24">💡</span>
+            <div>Each tile reveals its own colour after you submit a guess.</div>
+          </li>
+        </ul>
+
+        <div class="clue-legend">
+          <div class="clue-legend-title">TILE COLOURS</div>
+          <div class="clue-item">
+            <div class="clue-swatch clue-green"></div>
+            <div><strong>Green</strong> — correct digit, correct position.</div>
+          </div>
+          <div class="clue-item">
+            <div class="clue-swatch clue-yellow"></div>
+            <div><strong>Yellow</strong> — digit exists, wrong position.</div>
+          </div>
+          <div class="clue-item">
+            <div class="clue-swatch clue-gray"></div>
+            <div><strong>Gray</strong> — digit not in the number.</div>
+          </div>
+        </div>
+
+        <div class="info-example">
+          <div class="info-example-title">EXAMPLE · Secret: <strong>5 8 2 4</strong></div>
+          <div class="info-example-row">
+            <div class="ex-tiles">
+              <div class="ex-tile ex-green">5</div>
+              <div class="ex-tile ex-gray">9</div>
+              <div class="ex-tile ex-yellow">2</div>
+              <div class="ex-tile ex-yellow">8</div>
+            </div>
+          </div>
+          <p class="info-example-note">
+            <strong>5</strong> → green (right spot) · <strong>9</strong> → gray (absent) ·
+            <strong>2</strong> → yellow (wrong spot) · <strong>8</strong> → yellow (wrong spot)
+          </p>
+        </div>
+
+        <!-- Hint info -->
+        <div class="clue-legend">
+          <div class="clue-legend-title">HINTS (EASY MODE)</div>
+          <div class="clue-item">
+            <div class="clue-swatch" style="background:#6366f1"></div>
+            <div><strong>Hint 1</strong> — tells you if the answer is Odd or Even.</div>
+          </div>
+          <div class="clue-item">
+            <div class="clue-swatch" style="background:#8b5cf6"></div>
+            <div><strong>Hint 2</strong> — reveals the sum of all 4 digits.</div>
+          </div>
+        </div>
+
+        <button class="btn-play" id="closeInfoPlay">Let's Play! 🎯</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement unlock toast (separate from main toast) -->
+  <div class="achievement-toast" id="achievementToast" aria-live="polite">
+    <span class="ach-toast-icon" id="achToastIcon">🏆</span>
+    <div class="ach-toast-text">
+      <div class="ach-toast-title">Achievement Unlocked!</div>
+      <div class="ach-toast-name" id="achToastName">—</div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
